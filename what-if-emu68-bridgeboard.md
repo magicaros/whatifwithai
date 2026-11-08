@@ -1,4 +1,5 @@
-Tag: Amiga, Emu68, Virtualization
+Tags: Amiga, Emu68, Virtualization
+
 # What-If Scenario: Emu68 Fork with a Dedicated Co-Processor VM Core for PiStorm
 
 **Topic:** Exploring the feasibility of running a virtualized x86 Bridgeboard or native ARM Linux co-processor on an unused Raspberry Pi core alongside Emu68.
