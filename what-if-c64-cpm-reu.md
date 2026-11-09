@@ -21,17 +21,28 @@
 
 **Key Takeaways:**
 * **Root Cause of the 1983 Bug:** Commodore's hasty 1541 adaptation mapped Drive `B:` to the exact same Disk Parameter Header (`DPH`) scratchpad and allocation buffers as Drive `A:`, causing cross-drive `PIP` copies to overwrite directory blocks.
-* **Clean BIOS Jump Table Hooking:** Rather than patching inside Commodore's messy 1541 IEC serial routines, a runtime `.COM` installer intercepts the standard **CP/M BIOS Jump Table** (`SELDSK`, `SETTRK`, `SETSEC`, `SETDMA`, `READ`, `WRITE`) at the top of memory:
+* **Clean BIOS Jump Table Hooking:** Rather than patching inside Commodore's messy 1983 1541 IEC serial routines, a runtime `.COM` installer (`REUDISK.COM`) intercepts the standard **CP/M BIOS Jump Table** (`SELDSK`, `SETTRK`, `SETSEC`, `SETDMA`, `READ`, `WRITE`) at the top of memory:
   * **Drive `A:` (`C = 0`):** Passes straight through to Commodore's original BIOS routines untouched.
   * **Drive `B:` (`C = 1`):** Points `HL` to a completely isolated **Disk Parameter Header (`DPH`)**, **Disk Parameter Block (`DPB`)**, and **64-byte Allocation Vector (`ALV`)** allocated in free high RAM, routing all I/O exclusively to the Z80/6510 REU DMA trampoline.
 * **Result:** Completely bypasses the 1541 serial bus and fixes a 43-year-old Commodore bug while giving C64 CP/M a 512 KB solid-state drive.
 
 ---
 
-## 3. Architecture Summary & Graveyard Epitaph
-* **Memory Offset Rule:** All shared RAM pointers must account for the CP/M cartridge's `+$1000` address translation (`Z80 $0000` = `6510 $1000`, `Z80 $CE00` = `6510 $DE00`).
-* **Interrupt Safety:** The 6510 trampoline must disable interrupts (`SEI`) during REU DMA transfers (`$DF01`) and restore status cleanly before returning the bus to the Z80.
+## 3. Proof of Concept Confirmed (`REUDISK.COM` in VICE)
+* **Working Implementation:** Tested in `VICE (C64SC)` with both the CP/M cartridge and a 512 KB REU enabled simultaneously. Running `REUDISK.COM` cleanly mounts `B:` without interfering with `A:`.
+* **Verified `STAT B:DSK:` Output:**
+  * **4096:** 128-byte record capacity
+  * **512:** Kilobyte drive capacity
+  * **128:** 32-byte directory entries (`0` checked directory entries, `0` reserved tracks)
+  * **16:** Records/Block (`256` records/extent, `128` sectors/track)
+* **Zero-Corruption Cross-Drive Copies:** Core CP/M system utilities (`MOVCPM.COM`, `PIP.COM`, `SUBMIT.COM`, `XSUB.COM`, `ED.COM`, `ASM.COM`, `DDT.COM`, `LOAD.COM`, `STAT.COM`, `SYSGEN.COM`, `DUMP.COM`, `COPY.COM`, `CONFIG.COM`, and `REUDISK.COM`) copy cleanly from `A:` to `B:` with zero directory scrambling.
+* **Persistent Solid-State Mode (`REUDISK K`):** Passing the `K` (*Keep*) parameter (`REUDISK K`) skips formatting the directory track on initialization. When paired with a saved VICE REU image file, `B:` retains all files across cold reboots—turning the REU into a persistent 512 KB solid-state drive for C64 CP/M.
+
+---
+
+## 4. Architecture Summary & Graveyard Epitaph
+* **Memory Offset Rule:** All shared RAM pointers account for the CP/M cartridge's `+$1000` address translation (`Z80 $0000` = `6510 $1000`, `Z80 $CE00` = `6510 $DE00`).
+* **Interrupt Safety:** The 6510 trampoline disables interrupts (`SEI`) during REU DMA transfers (`$DF01`) and restores status cleanly before returning the bus to the Z80.
 * **Graveyard Tombstone (Real Hardware Edition):**
   > **Here Lies the Dual-Cartridge C64 CP/M + REU Rig (1983–2026)**  
   > *"Died of two bus masters fighting over one `/DMA` pin and a 40-year-old power brick."*
-
