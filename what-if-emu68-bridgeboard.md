@@ -1,4 +1,4 @@
-Tags: Amiga, Emu68, Virtualization
+Tags:
 
 # What-If Scenario: Emu68 Fork with a Dedicated Co-Processor VM Core for PiStorm
 
@@ -72,4 +72,12 @@ Tags: Amiga, Emu68, Virtualization
   * Unlocks completely idle CPU cores and unreachable RAM on Pi 4 / CM4 setups with zero performance penalty to AmigaOS.
   * Brings big-box PC co-processor capabilities to wedge Amigas (A500, A600, A1200) that lack Zorro slots.
   * Purely software-defined—requires zero new hardware for existing PiStorm + Pi 4 owners.
+
+---
+
+## 6. Hardware Survival Verdict & Graveyard Epitaph
+* **Real Hardware Verdict:** **Electrically Safe, Architecturally Hazardous.** Because everything runs inside the Raspberry Pi's existing silicon and upper RAM without adding extra bus loads to the Amiga's 68000 socket, your motherboard stays completely safe. However, forgetting a single ARMv8 `DMB` memory barrier in the shared `virtio` ring buffer will silently scramble both operating systems at once.
+* **Graveyard Tombstone (Moonshot Edition):**
+  > **Here Lies a Franken-Amiga 500 Running Windows XP Inside a PiStorm (2026)**  
+  > *"Died of an ARMv8 L1 cache coherency race condition—taking out Workbench 3.1, Alpine Linux, and Solitaire in a single clock cycle."*
 

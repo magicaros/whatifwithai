@@ -40,9 +40,29 @@
 
 ---
 
+### 3.5.1 v1.2 Evolution: Production-Grade C64 CP/M Ergonomics
+* **Dynamic 44K / 48K TPA Detection:** Rather than hardcoding high-memory offsets, `REUDISK v1.2` calculates its resident footprint dynamically from the active BIOS vector table, running seamlessly on both stock 44K TPA and expanded 48K TPA configurations.
+* **Coexistence with Modern `SOFT80.COM`:** Properly chains into high memory alongside modern 80-column soft-terminal drivers (including Kaypro II/4 terminal emulation), preventing buffer collisions when running full-screen CP/M software like WordStar, Multiplan, or Turbo Pascal.
+* **Fast (Instant) REU Warm Boots (`WBOOT` Hook):** Saves a pristine image of the CCP/BDOS in a reserved REU bank during initialization and hooks the BIOS `WBOOT` entry point. While the Z80 ↔ 6510 bus-switching trampoline adds modest per-sector overhead, reloading the command processor via REU DMA takes a fraction of a second—dramatically faster than waiting on the 1541's sluggish IEC serial bus. (the driver called it Instant, it's a bit of a missnomer)
+> **Hardware Reality Check:** Commodore's 1983 CP/M cartridge was forced to run its Z80 synchronously with the C64's ~1 MHz bus (yielding roughly **2 MHz** effective execution speed) while still losing clock cycles to VIC-II DMA steals. Because the Z80 ↔ 6510 trampoline executes on this throttled bus for every 128-byte record, REU transfers aren't "instant"—yet they still transform usability by eliminating the far worse bottleneck of the 1541 IEC serial drive.
+
+---
+
+#### 3.5.2 Command-Line Usage (`REUDISK.COM`)
+* **`REUDISK` (No Parameters):**
+  * **Cold Load (Not Yet Resident):** Installs the resident driver in high memory, caches the CCP/BDOS for instant warm boots, mounts Drive `B:`, and formats the REU directory track (`$E5` fill) for a fresh 512 KB RAM-disk.
+  * **Already Resident:** Detects the active driver signature in memory, leaves existing files untouched, and prints a notice informing the user that `REUDISK` is already loaded (instructing them to run `REUDISK F` if they intentionally want to reformat).
+* **`REUDISK F` (*Force Format*):** Explicitly formats (or reformats) the REU directory track (`$E5` fill), whether installing on a cold boot or wiping an already-mounted RAM-disk.
+* **`REUDISK K` (*Keep*):** Persistent solid-state mode. Installs the driver, mounts Drive `B:`, and hooks instant `WBOOT` **without** erasing the directory track—preserving existing files across soft resets or when loading a pre-populated `.reu` image file in VICE.
+
+> **Figure 1.1:** *`REUDISK 1.2` running inside `VICE (C64SC)` alongside Chris Lampton's 80-Column Kaypro-2X terminal driver (`SOFT80`). With `REUDISK K` mounted, Drive `B:` serves full `WordStar` overlays, `MBASIC`, and classic CP/M games at solid-state DMA speeds with instant warm boots.*
+
+---
+
 ## 4. Architecture Summary & Graveyard Epitaph
 * **Memory Offset Rule:** All shared RAM pointers account for the CP/M cartridge's `+$1000` address translation (`Z80 $0000` = `6510 $1000`, `Z80 $CE00` = `6510 $DE00`).
 * **Interrupt Safety:** The 6510 trampoline disables interrupts (`SEI`) during REU DMA transfers (`$DF01`) and restores status cleanly before returning the bus to the Z80.
 * **Graveyard Tombstone (Real Hardware Edition):**
   > **Here Lies the Dual-Cartridge C64 CP/M + REU Rig (1983–2026)**  
   > *"Died of two bus masters fighting over one `/DMA` pin and a 40-year-old power brick."*
+

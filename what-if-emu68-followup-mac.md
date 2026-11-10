@@ -62,3 +62,12 @@
 ## 3. Verdict
 * **Choose Isolated Linux + SheepShaver** if you prioritize **immediate software readiness, crash isolation, and utilizing excess upper RAM** on a 4 GB or 8 GB Raspberry Pi 4.
 * **Choose Native Amiga Emu68 PPC** if a developer ports SheepShaver to **WarpOS (`powerpc.library`)**, trading upper-RAM access and crash isolation for **simpler setup, bare-metal speed, and native Workbench integration**.
+
+---
+
+## 4. Hardware Survival Verdict & Graveyard Epitaph
+* **Real Hardware Verdict:** **Hardware Safe, Filesystem Fragile.** Your Amiga motherboard and Raspberry Pi are completely safe, and a Classic Mac OS 9 freeze stays quarantined inside Core 1 while Workbench keeps humming along on Core 0. However, yanking the Amiga's power switch without signaling Linux to unmount the HFS+ volume first will leave your virtual Macintosh begging for Disk First Aid on the next boot.
+* **Graveyard Tombstone (Classic Mac Edition):**
+  > **Here Lies a Virtual PowerMac 9500 Trapped Inside Core 1 (2026)**  
+  > *"Died of a cooperative-multitasking Type 11 Bomb in Mac OS 9.0.4—leaving a smiling Finder icon frozen in upper RAM while AmigaOS didn't even notice."*
+
