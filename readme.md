@@ -8,4 +8,4 @@ most of them will probably be retro technologically inclined, but you never know
 
 ## Fun factor, each technical what-if come with it's Graveyard Epitaph at the end.
 
-because there is always some Reality check or simple the law of murphy working against you.
+because there is always some Reality check or simply murphy's law working against you.
