@@ -8,4 +8,4 @@ most of them will probably be retro technologically inclined, but you never know
 
 ## Bonus Fun factor, each technical what-if come with it's Graveyard Epitaph at the end.
 
-because there is always some Reality Check or simply murphy's law working against you.
+because there is always some Reality Check or simply murphy's law working against you. and even that's neither the case you still might run into a Catch-22 !
